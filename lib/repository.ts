@@ -1,4 +1,4 @@
-import { get, put } from "@vercel/blob";
+import { BlobNotFoundError, get, head, put } from "@vercel/blob";
 import { randomBytes } from "crypto";
 import { mkdir, readFile, rename, writeFile } from "fs/promises";
 import path from "path";
@@ -124,11 +124,20 @@ const localCatalog: CatalogIO = {
 };
 
 async function readBlobCatalog(): Promise<ModelRecord[]> {
-  const result = await get(CATALOG_PATH, { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) {
-    const seed = await readSeed();
-    return writeBlobCatalog(seed);
+  try {
+    await head(CATALOG_PATH);
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) {
+      return writeBlobCatalog(await readSeed());
+    }
+    throw error;
   }
+  const result = await get(CATALOG_PATH, {
+    access: "private",
+    useCache: false,
+    headers: { "cache-control": "no-cache" },
+  });
+  if (!result || result.statusCode !== 200) throw new Error("Could not read the catalog.");
   const parsed = JSON.parse(await new Response(result.stream).text()) as ModelRecord[];
   if (!Array.isArray(parsed)) throw new Error("Could not read the catalog.");
   return sortModels(parsed);
