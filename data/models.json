@@ -1,5 +1,31 @@
 [
   {
+    "id": "d3c776a65c46",
+    "title": "Cyberwheel Warlord",
+    "description": "Cyberwheel Warlord",
+    "category": "Figurine",
+    "span": "1x1",
+    "notes": "",
+    "src": "/uploads/models/74d3285a57a322df.glb",
+    "thumbnail": "/uploads/thumbs/572f7f78c2232a5c.jpg",
+    "polycount": 1502150,
+    "createdAt": "2026-11-18T07:27:05.883Z",
+    "order": 0
+  },
+  {
+    "id": "8991eee5f86c",
+    "title": "Robot",
+    "description": "Humanoid Robot",
+    "category": "Figurine",
+    "span": "2x1",
+    "notes": "",
+    "src": "/uploads/models/a369dbfdce041012.glb",
+    "thumbnail": "/uploads/thumbs/605b9101c7b79447.jpg",
+    "polycount": 1219241,
+    "createdAt": "2026-11-18T07:37:05.868Z",
+    "order": 1
+  },
+  {
     "id": "boom-box",
     "title": "Boom Box",
     "description": "A pocket radio pushed through every PBR channel that matters: chipped enamel, a woven speaker grille, and a handle that still reads as painted metal.",
@@ -10,7 +36,7 @@
     "polycount": 6036,
     "notes": "CC0. Microsoft.",
     "createdAt": "2024-03-01T00:00:00.000Z",
-    "order": 0
+    "order": 2
   },
   {
     "id": "iridescence-lamp",
@@ -23,7 +49,7 @@
     "polycount": 18866,
     "notes": "CC BY 4.0. Wayfair. The Bonsell table lamp.",
     "createdAt": "2024-03-02T00:00:00.000Z",
-    "order": 1
+    "order": 3
   },
   {
     "id": "sheen-chair",
@@ -36,7 +62,7 @@
     "polycount": 39936,
     "notes": "CC BY 4.0. Eric Chadwick for Wayfair.",
     "createdAt": "2024-03-03T00:00:00.000Z",
-    "order": 2
+    "order": 4
   },
   {
     "id": "water-bottle",
@@ -49,7 +75,7 @@
     "polycount": 4510,
     "notes": "CC0. Microsoft.",
     "createdAt": "2024-03-04T00:00:00.000Z",
-    "order": 3
+    "order": 5
   },
   {
     "id": "velvet-sofa",
@@ -62,20 +88,7 @@
     "polycount": 4196,
     "notes": "CC BY 4.0. Wayfair. Frankie sofa bed.",
     "createdAt": "2024-03-05T00:00:00.000Z",
-    "order": 4
-  },
-  {
-    "id": "avocado",
-    "title": "Avocado",
-    "description": "Skin, flesh, and the pit. A small mesh with a loud normal map — the pebble of the rind is the whole study.",
-    "category": "Nature",
-    "span": "1x1",
-    "src": "/samples/models/avocado.glb",
-    "thumbnail": "/samples/thumbs/avocado.jpg",
-    "polycount": 682,
-    "notes": "CC0. Microsoft.",
-    "createdAt": "2024-03-06T00:00:00.000Z",
-    "order": 5
+    "order": 6
   },
   {
     "id": "carbon-fibre",
@@ -88,32 +101,19 @@
     "polycount": 3968,
     "notes": "CC BY 4.0. Eric Chadwick for Wayfair.",
     "createdAt": "2024-03-07T00:00:00.000Z",
-    "order": 6
-  },
-  {
-    "id": "fox",
-    "title": "Fox",
-    "description": "A low-poly fox with a walk cycle. Flat color, a hard silhouette, and just enough texture to read as fur from across the room.",
-    "category": "Creature",
-    "span": "1x1",
-    "src": "/samples/models/fox.glb",
-    "thumbnail": "/samples/thumbs/fox.jpg",
-    "polycount": 576,
-    "notes": "Mesh CC0, PixelMannen. Rig and walk CC BY 4.0, tomkranis.",
-    "createdAt": "2024-03-08T00:00:00.000Z",
     "order": 7
   },
   {
-    "id": "milk-truck",
-    "title": "Milk Truck",
-    "description": "Cesium’s milk truck, kept small on purpose. Painted panels, a simple cabin, and a silhouette that still reads at thumbnail size.",
-    "category": "Vehicle",
-    "span": "1x1",
-    "src": "/samples/models/milk-truck.glb",
-    "thumbnail": "/samples/thumbs/milk-truck.jpg",
-    "polycount": 2856,
-    "notes": "CC BY 4.0. Cesium.",
-    "createdAt": "2024-03-09T00:00:00.000Z",
+    "id": "a897b2dd2bcd",
+    "title": "Squiggle Studio 2 model",
+    "description": "",
+    "category": "Figurine",
+    "span": "2x1",
+    "notes": "",
+    "src": "/uploads/models/1af20f719293ceaf.glb",
+    "thumbnail": "/uploads/thumbs/5acb035618c7b1b1.jpg",
+    "polycount": 887794,
+    "createdAt": "2026-11-18T07:43:18.358Z",
     "order": 8
   }
 ]
