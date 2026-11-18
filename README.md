@@ -42,7 +42,7 @@ Click the lock in the header.
 
 Prefer a self-contained `.glb`. A `.gltf` that points at external textures or `.bin` files will not resolve from a single upload.
 
-Without a blob token, uploads land in `public/uploads/`. The seed studies live in `public/samples/` and `data/models.json`. With a token, new files land in the Blob store and the catalog is a private object named `catalog/models.json`. The first visit copies the seed catalog into that object.
+Without a blob token, uploads land in `public/uploads/`. The seed studies live in `public/samples/` and `data/models.json`. With a token, new files land in the Blob store and the catalog is `catalog/models.json` in that store. The first visit copies the seed catalog into that object.
 
 ## Swap the storage later
 

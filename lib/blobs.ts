@@ -46,7 +46,7 @@ export function assertOwnedBlobUrl(value: unknown, kind: "model" | "thumb") {
     throw new Error("Invalid file.");
   }
   const host = blobStoreHost();
-  if (!host || url.protocol !== "https:" || url.hostname !== host || url.username || url.password) {
+  if (!host || url.protocol !== "https:" || url.hostname.toLowerCase() !== host || url.username || url.password) {
     throw new Error("Invalid file.");
   }
   const pattern =
@@ -120,7 +120,7 @@ export const vercelBlobs: BlobStore = {
     if (!host) return;
     try {
       const url = new URL(publicPath);
-      if (url.protocol !== "https:" || url.hostname !== host) return;
+      if (url.protocol !== "https:" || url.hostname.toLowerCase() !== host) return;
     } catch {
       return;
     }

@@ -1,4 +1,4 @@
-import { BlobNotFoundError, get, head, put } from "@vercel/blob";
+import { BlobNotFoundError, head, put } from "@vercel/blob";
 import { randomBytes } from "crypto";
 import { mkdir, readFile, rename, writeFile } from "fs/promises";
 import path from "path";
@@ -8,8 +8,8 @@ import type { ModelInput, ModelPatch, ModelRecord } from "@/lib/types";
 /**
  * ModelRepository is the catalog seam.
  * Without a blob token it stores data/models.json. With
- * BLOB_READ_WRITE_TOKEN the same methods read and write a private
- * catalog object, so admin changes survive a serverless deploy.
+ * BLOB_READ_WRITE_TOKEN the same methods read and write a catalog
+ * object in Vercel Blob, so admin changes survive a serverless deploy.
  */
 export interface ModelRepository {
   list(): Promise<ModelRecord[]>;
@@ -124,21 +124,20 @@ const localCatalog: CatalogIO = {
 };
 
 async function readBlobCatalog(): Promise<ModelRecord[]> {
+  let meta;
   try {
-    await head(CATALOG_PATH);
+    meta = await head(CATALOG_PATH);
   } catch (error) {
     if (error instanceof BlobNotFoundError) {
       return writeBlobCatalog(await readSeed());
     }
     throw error;
   }
-  const result = await get(CATALOG_PATH, {
-    access: "private",
-    useCache: false,
-    headers: { "cache-control": "no-cache" },
-  });
-  if (!result || result.statusCode !== 200) throw new Error("Could not read the catalog.");
-  const parsed = JSON.parse(await new Response(result.stream).text()) as ModelRecord[];
+  // A unique query skips the Blob CDN cache, which otherwise holds a public
+  // object for at least a minute. The catalog itself is the same data the gallery API returns.
+  const response = await fetch(`${meta.url}?v=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) throw new Error("Could not read the catalog.");
+  const parsed = JSON.parse(await response.text()) as ModelRecord[];
   if (!Array.isArray(parsed)) throw new Error("Could not read the catalog.");
   return sortModels(parsed);
 }
@@ -146,10 +145,11 @@ async function readBlobCatalog(): Promise<ModelRecord[]> {
 async function writeBlobCatalog(models: ModelRecord[]) {
   const ordered = models.map((model, order) => ({ ...model, order }));
   await put(CATALOG_PATH, JSON.stringify(ordered), {
-    access: "private",
+    access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
+    cacheControlMaxAge: 60,
   });
   return ordered;
 }
