@@ -2,7 +2,7 @@
 
 A dark, single-page shelf for textured 3D models. The public view is a bento grid. Click a study to orbit it, switch the light, or drop it into wireframe. A password unlocks an admin shelf for uploads, grid size, copy, and order.
 
-The catalog is a JSON file and the models live in `public/`, so you can run it immediately. The repository and blob helpers are the seams if you later move the catalog to Supabase and the files to S3 or Supabase Storage.
+The catalog is a JSON file and the models live in `public/`, so you can run it immediately. Set `BLOB_READ_WRITE_TOKEN` and the same helpers store the catalog and uploads in Vercel Blob, which is what the hosted site uses.
 
 ## Run it
 
@@ -20,6 +20,8 @@ cp .env.example .env.local
 ```
 
 Set `ADMIN_PASSWORD` in `.env.local`, then start the dev server again. Login stays closed until that variable is set. The session cookie is HTTP-only. On a hosted deploy, set the same variable in the host’s secret store rather than committing it.
+
+Leave `BLOB_READ_WRITE_TOKEN` empty for the local files. When it is set, adding or deleting a study writes the catalog and the files to that Blob store. Large models upload from the browser, so they are not limited by the server request size.
 
 ## Use the gallery
 
@@ -40,12 +42,12 @@ Click the lock in the header.
 
 Prefer a self-contained `.glb`. A `.gltf` that points at external textures or `.bin` files will not resolve from a single upload.
 
-Uploads land in `public/uploads/`. The seed studies live in `public/samples/` and `data/models.json`.
+Without a blob token, uploads land in `public/uploads/`. The seed studies live in `public/samples/` and `data/models.json`. With a token, new files land in the Blob store and the catalog is a private object named `catalog/models.json`. The first visit copies the seed catalog into that object.
 
 ## Swap the storage later
 
-- `lib/repository.ts` — `ModelRepository` reads and writes the catalog. `getRepository()` returns the JSON adapter.
-- `lib/blobs.ts` — `BlobStore` saves and deletes model and thumbnail bytes. `getBlobs()` returns the local `public/` adapter.
+- `lib/repository.ts` — `ModelRepository` reads and writes the catalog. `getRepository()` returns the JSON adapter, or the Blob adapter when `BLOB_READ_WRITE_TOKEN` is set.
+- `lib/blobs.ts` — `BlobStore` saves and deletes model and thumbnail bytes. `getBlobs()` returns the local `public/` adapter, or Vercel Blob with the same token.
 
 API routes talk only to those two interfaces. A Supabase table can implement `ModelRepository`, and Supabase Storage or S3 can implement `BlobStore`, without changing the gallery.
 

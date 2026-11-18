@@ -27,16 +27,20 @@ function countTriangles(json: GltfJson): number {
   return triangles;
 }
 
-export function polycountFromGlb(buffer: Buffer): number | null {
+function readU32(bytes: Uint8Array, offset: number) {
+  return new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(offset, true);
+}
+
+export function polycountFromGlb(buffer: Uint8Array): number | null {
   if (buffer.length < 20) return null;
-  const magic = buffer.readUInt32LE(0);
+  const magic = readU32(buffer, 0);
   if (magic !== 0x46546c67) return null;
-  const chunkLength = buffer.readUInt32LE(12);
-  const chunkType = buffer.readUInt32LE(16);
+  const chunkLength = readU32(buffer, 12);
+  const chunkType = readU32(buffer, 16);
   if (chunkType !== 0x4e4f534a) return null;
   if (20 + chunkLength > buffer.length) return null;
   try {
-    const json = JSON.parse(buffer.subarray(20, 20 + chunkLength).toString("utf8")) as GltfJson;
+    const json = JSON.parse(new TextDecoder().decode(buffer.subarray(20, 20 + chunkLength))) as GltfJson;
     return countTriangles(json);
   } catch {
     return null;

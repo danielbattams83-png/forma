@@ -1,11 +1,13 @@
+import { del, put } from "@vercel/blob";
 import { randomBytes } from "crypto";
 import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";
 
 /**
  * BlobStore is the file seam. LocalDisk writes into /public so the
- * dev server can serve a model immediately. An S3 or Supabase Storage
- * adapter can implement the same two saves and the same remove.
+ * dev server can serve a model immediately. When BLOB_READ_WRITE_TOKEN
+ * is set, files go to Vercel Blob and the browser can upload them
+ * directly. An S3 adapter can implement the same two saves and remove.
  */
 export type SavedBlob = { publicPath: string };
 
@@ -16,6 +18,44 @@ export interface BlobStore {
 }
 
 const PUBLIC_PREFIXES = ["/uploads/", "/samples/"];
+
+const CONTENT_TYPES = {
+  glb: "model/gltf-binary",
+  gltf: "model/gltf+json",
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+} as const;
+
+export function blobStoreHost() {
+  const token = process.env.BLOB_READ_WRITE_TOKEN ?? "";
+  const id = token.match(/^vercel_blob_rw_([A-Za-z0-9]+)_/)?.[1];
+  return id ? `${id.toLowerCase()}.public.blob.vercel-storage.com` : null;
+}
+
+export function usesBlobStorage() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+export function assertOwnedBlobUrl(value: unknown, kind: "model" | "thumb") {
+  if (typeof value !== "string" || value.length > 500) throw new Error("Invalid file.");
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("Invalid file.");
+  }
+  const host = blobStoreHost();
+  if (!host || url.protocol !== "https:" || url.hostname !== host || url.username || url.password) {
+    throw new Error("Invalid file.");
+  }
+  const pattern =
+    kind === "model"
+      ? /^\/uploads\/models\/[A-Za-z0-9._-]+\.(glb|gltf)$/
+      : /^\/uploads\/thumbs\/[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp)$/;
+  if (!pattern.test(url.pathname)) throw new Error(kind === "model" ? "Invalid model file." : "Invalid thumbnail.");
+  return `https://${host}${url.pathname}`;
+}
 
 function publicRoot() {
   return path.resolve(process.cwd(), "public");
@@ -53,10 +93,41 @@ export const localBlobs: BlobStore = {
     return writePublic("uploads/thumbs", extension, bytes);
   },
   async remove(publicPath) {
+    if (/^https?:\/\//i.test(publicPath)) return;
     await rm(resolvePublic(publicPath), { force: true });
   },
 };
 
+async function putPublic(folder: string, extension: keyof typeof CONTENT_TYPES, bytes: Buffer) {
+  const id = randomBytes(8).toString("hex");
+  const blob = await put(`${folder}/${id}.${extension}`, bytes, {
+    access: "public",
+    addRandomSuffix: false,
+    contentType: CONTENT_TYPES[extension],
+  });
+  return { publicPath: blob.url };
+}
+
+export const vercelBlobs: BlobStore = {
+  saveModel(bytes, extension) {
+    return putPublic("uploads/models", extension, bytes);
+  },
+  saveThumb(bytes, extension) {
+    return putPublic("uploads/thumbs", extension, bytes);
+  },
+  async remove(publicPath) {
+    const host = blobStoreHost();
+    if (!host) return;
+    try {
+      const url = new URL(publicPath);
+      if (url.protocol !== "https:" || url.hostname !== host) return;
+    } catch {
+      return;
+    }
+    await del(publicPath);
+  },
+};
+
 export function getBlobs(): BlobStore {
-  return localBlobs;
+  return usesBlobStorage() ? vercelBlobs : localBlobs;
 }

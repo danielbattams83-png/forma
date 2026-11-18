@@ -39,19 +39,29 @@ export function extensionOf(filename: string) {
   return match ? match[1] : "";
 }
 
-export function isModelFile(filename: string, bytes: Buffer) {
+function readU32(bytes: Uint8Array, offset: number) {
+  return new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(offset, true);
+}
+
+function ascii(bytes: Uint8Array, start: number, end: number) {
+  let text = "";
+  for (let index = start; index < end; index += 1) text += String.fromCharCode(bytes[index] ?? 0);
+  return text;
+}
+
+export function isModelFile(filename: string, bytes: Uint8Array) {
   const ext = extensionOf(filename);
   if (ext === "glb") {
-    return bytes.length >= 4 && bytes.readUInt32LE(0) === 0x46546c67;
+    return bytes.length >= 4 && readU32(bytes, 0) === 0x46546c67;
   }
   if (ext === "gltf") {
-    const start = bytes.subarray(0, 64).toString("utf8").trimStart();
-    return start.startsWith("{") && bytes.includes(Buffer.from('"asset"'));
+    const start = new TextDecoder().decode(bytes.subarray(0, 64)).trimStart();
+    return start.startsWith("{") && new TextDecoder().decode(bytes).includes('"asset"');
   }
   return false;
 }
 
-export function imageExtension(bytes: Buffer): "jpg" | "png" | "webp" | null {
+export function imageExtension(bytes: Uint8Array): "jpg" | "png" | "webp" | null {
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
     return "jpg";
   }
@@ -64,11 +74,7 @@ export function imageExtension(bytes: Buffer): "jpg" | "png" | "webp" | null {
   ) {
     return "png";
   }
-  if (
-    bytes.length >= 12 &&
-    bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
-    bytes.subarray(8, 12).toString("ascii") === "WEBP"
-  ) {
+  if (bytes.length >= 12 && ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 12) === "WEBP") {
     return "webp";
   }
   return null;

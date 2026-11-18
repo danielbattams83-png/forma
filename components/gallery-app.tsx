@@ -20,6 +20,7 @@ export function GalleryApp({ initialModels }: { initialModels: ModelRecord[] }) 
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetSignal, setResetSignal] = useState(0);
   const [authed, setAuthed] = useState(false);
+  const [directUpload, setDirectUpload] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [liveId, setLiveId] = useState<string | null>(null);
@@ -49,7 +50,10 @@ export function GalleryApp({ initialModels }: { initialModels: ModelRecord[] }) 
   useEffect(() => {
     fetch("/api/auth/session")
       .then((response) => response.json())
-      .then((body: { authenticated?: boolean }) => setAuthed(Boolean(body.authenticated)))
+      .then((body: { authenticated?: boolean; storage?: string }) => {
+        setAuthed(Boolean(body.authenticated));
+        setDirectUpload(body.storage === "blob");
+      })
       .catch(() => setAuthed(false));
   }, []);
 
@@ -188,6 +192,7 @@ export function GalleryApp({ initialModels }: { initialModels: ModelRecord[] }) 
       <AdminDrawer
         open={adminOpen}
         models={models}
+        directUpload={directUpload}
         onClose={() => setAdminOpen(false)}
         onModels={commit}
         onCreated={(model) => commit([...models, model])}

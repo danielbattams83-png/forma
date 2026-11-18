@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import dynamic from "next/dynamic";
 import {
   ChevronDown,
@@ -16,7 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ModelStageHandle } from "@/components/model-stage";
+import { polycountFromGlb, polycountFromGltf } from "@/lib/polycount";
 import { SPANS, formatCount, type ModelRecord, type Span } from "@/lib/types";
+import { isModelFile } from "@/lib/validators";
 import { cn } from "cn";
 
 const ModelStage = dynamic(
@@ -27,13 +30,26 @@ const ModelStage = dynamic(
 type AdminDrawerProps = {
   open: boolean;
   models: ModelRecord[];
+  directUpload: boolean;
   onClose: () => void;
   onModels: (models: ModelRecord[]) => void;
   onCreated: (model: ModelRecord) => void;
   onLogout: () => void;
 };
 
-export function AdminDrawer({ open, models, onClose, onModels, onCreated, onLogout }: AdminDrawerProps) {
+function fileFromBytes(bytes: Uint8Array, name: string, type: string) {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return new File([copy], name, { type });
+}
+
+function safeName(name: string, extension: string) {
+  const base = (name.split(/[/\\]/).pop() || "model").replace(/\.[^.]+$/, "");
+  const cleaned = base.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+  return `${cleaned || "model"}.${extension}`;
+}
+
+export function AdminDrawer({ open, models, directUpload, onClose, onModels, onCreated, onLogout }: AdminDrawerProps) {
   const [tab, setTab] = useState<"add" | "library">("add");
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -91,6 +107,7 @@ export function AdminDrawer({ open, models, onClose, onModels, onCreated, onLogo
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
           {tab === "add" ? (
             <AddModelForm
+              directUpload={directUpload}
               onCreated={(model) => {
                 onCreated(model);
                 setTab("library");
@@ -112,7 +129,80 @@ export function AdminDrawer({ open, models, onClose, onModels, onCreated, onLogo
   );
 }
 
-function AddModelForm({ onCreated }: { onCreated: (model: ModelRecord) => void }) {
+function uploadLocally(input: {
+  file: File;
+  thumbBlob: Blob;
+  title: string;
+  category: string;
+  description: string;
+  notes: string;
+  span: Span;
+}) {
+  const body = new FormData();
+  body.set("file", input.file);
+  body.set("thumbnail", new File([input.thumbBlob], "thumbnail.jpg", { type: input.thumbBlob.type || "image/jpeg" }));
+  body.set("title", input.title);
+  body.set("category", input.category);
+  body.set("description", input.description);
+  body.set("notes", input.notes);
+  body.set("span", input.span);
+  return fetch("/api/upload", { method: "POST", body });
+}
+
+async function uploadToBlob(input: {
+  file: File;
+  bytes: Uint8Array;
+  extension: "glb" | "gltf";
+  thumbBlob: Blob;
+  title: string;
+  category: string;
+  description: string;
+  notes: string;
+  span: Span;
+  polycount: number | null;
+}) {
+  const modelType = input.extension === "gltf" ? "model/gltf+json" : "model/gltf-binary";
+  const modelName = safeName(input.file.name, input.extension);
+  const savedModel = await upload(`uploads/models/${modelName}`, fileFromBytes(input.bytes, modelName, modelType), {
+    access: "public",
+    handleUploadUrl: "/api/blob",
+    contentType: modelType,
+  });
+  const thumbType = input.thumbBlob.type === "image/png" || input.thumbBlob.type === "image/webp" ? input.thumbBlob.type : "image/jpeg";
+  const thumbExt = thumbType === "image/png" ? "png" : thumbType === "image/webp" ? "webp" : "jpg";
+  const thumbName = `thumbnail.${thumbExt}`;
+  const savedThumb = await upload(
+    `uploads/thumbs/${thumbName}`,
+    new File([input.thumbBlob], thumbName, { type: thumbType }),
+    {
+      access: "public",
+      handleUploadUrl: "/api/blob",
+      contentType: thumbType,
+    },
+  );
+  return fetch("/api/models", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: input.title,
+      category: input.category,
+      description: input.description,
+      notes: input.notes,
+      span: input.span,
+      src: savedModel.url,
+      thumbnail: savedThumb.url,
+      polycount: input.polycount,
+    }),
+  });
+}
+
+function AddModelForm({
+  onCreated,
+  directUpload,
+}: {
+  onCreated: (model: ModelRecord) => void;
+  directUpload: boolean;
+}) {
   const stageRef = useRef<ModelStageHandle>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -168,16 +258,19 @@ function AddModelForm({ onCreated }: { onCreated: (model: ModelRecord) => void }
     }
     setPending(true);
     setError("");
-    const body = new FormData();
-    body.set("file", file);
-    body.set("thumbnail", new File([thumbBlob], "thumbnail.jpg", { type: thumbBlob.type || "image/jpeg" }));
-    body.set("title", title);
-    body.set("category", category);
-    body.set("description", description);
-    body.set("notes", notes);
-    body.set("span", span);
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if (!isModelFile(file.name, bytes)) {
+      setPending(false);
+      setError("That file does not look like a glTF model.");
+      return;
+    }
+    const extension = file.name.toLowerCase().endsWith(".gltf") ? "gltf" : "glb";
+    const polycount =
+      extension === "gltf" ? polycountFromGltf(new TextDecoder().decode(bytes)) : polycountFromGlb(bytes);
     try {
-      const response = await fetch("/api/upload", { method: "POST", body });
+      const response = directUpload
+        ? await uploadToBlob({ file, bytes, extension, thumbBlob, title, category, description, notes, span, polycount })
+        : await uploadLocally({ file, thumbBlob, title, category, description, notes, span });
       const payload = (await response.json()) as ModelRecord & { error?: string };
       if (!response.ok) {
         setError(payload.error || "Could not add the model.");

@@ -39,8 +39,8 @@ export async function DELETE(request: Request, context: Context) {
   try {
     const removed = await getRepository().remove(id);
     const blobs = getBlobs();
-    await blobs.remove(removed.src);
-    await blobs.remove(removed.thumbnail);
+    await blobs.remove(removed.src).catch(() => undefined);
+    await blobs.remove(removed.thumbnail).catch(() => undefined);
     const models = await getRepository().list();
     return NextResponse.json(models);
   } catch (error) {
