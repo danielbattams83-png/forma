@@ -2,9 +2,10 @@ export const ENVIRONMENTS = {
   studio: {
     label: "Studio",
     file: "https://htagr3mh3puvqdzy.public.blob.vercel-storage.com/hdri/studio.hdr",
-    intensity: 1,
-    exposure: 1,
-    background: "#121212",
+    // Held under 1 so card previews and the default viewer keep metal and pale surfaces from blowing out.
+    intensity: 0.4,
+    exposure: 0.55,
+    background: "#101010",
   },
   outdoor: {
     label: "Outdoor",
