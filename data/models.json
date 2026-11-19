@@ -1,16 +1,81 @@
 [
   {
+    "id": "midnight-marksman",
+    "title": "Midnight Marksman",
+    "description": "Midnight Marksman",
+    "category": "Figurine",
+    "span": "2x2",
+    "notes": "",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/midnight-marksman.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/midnight-marksman.png",
+    "polycount": 1051974,
+    "createdAt": "2026-11-19T04:00:00.000Z",
+    "order": 0
+  },
+  {
+    "id": "diablo",
+    "title": "Diablo",
+    "description": "Diablo",
+    "category": "Figurine",
+    "span": "2x2",
+    "notes": "",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/diablo.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/diablo.png",
+    "polycount": 615657,
+    "createdAt": "2026-11-19T03:59:00.000Z",
+    "order": 1
+  },
+  {
     "id": "d3c776a65c46",
     "title": "Cyberwheel Warlord",
     "description": "Cyberwheel Warlord",
     "category": "Figurine",
-    "span": "1x1",
+    "span": "2x1",
     "notes": "",
-    "src": "https://htagr3mh3puvqdzy.public.blob.vercel-storage.com/uploads/models/74d3285a57a322df.glb",
-    "thumbnail": "https://htagr3mh3puvqdzy.public.blob.vercel-storage.com/uploads/thumbs/572f7f78c2232a5c.jpg",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/cyberwheel-warlord.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/cyberwheel-warlord.png",
     "polycount": 1502150,
     "createdAt": "2026-11-18T07:27:05.883Z",
-    "order": 0
+    "order": 2
+  },
+  {
+    "id": "tucker-3",
+    "title": "Tucker 3",
+    "description": "Tucker 3",
+    "category": "Figurine",
+    "span": "1x1",
+    "notes": "",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/tucker-3.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/tucker-3.jpg",
+    "polycount": 987005,
+    "createdAt": "2026-11-19T03:58:00.000Z",
+    "order": 3
+  },
+  {
+    "id": "tucker-2",
+    "title": "Tucker 2",
+    "description": "Tucker 2",
+    "category": "Figurine",
+    "span": "1x1",
+    "notes": "",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/tucker-2.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/tucker-2.jpg",
+    "polycount": 908969,
+    "createdAt": "2026-11-19T03:57:00.000Z",
+    "order": 4
+  },
+  {
+    "id": "tucker-1",
+    "title": "Tucker 1",
+    "description": "Tucker 1",
+    "category": "Figurine",
+    "span": "2x1",
+    "notes": "",
+    "src": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/models/tucker-1.glb",
+    "thumbnail": "https://ax5nv62ro8su3reg.public.blob.vercel-storage.com/uploads/thumbs/tucker-1.jpg",
+    "polycount": 2353128,
+    "createdAt": "2026-11-19T03:56:00.000Z",
+    "order": 5
   },
   {
     "id": "8991eee5f86c",
@@ -23,7 +88,7 @@
     "thumbnail": "https://htagr3mh3puvqdzy.public.blob.vercel-storage.com/uploads/thumbs/605b9101c7b79447.jpg",
     "polycount": 1219241,
     "createdAt": "2026-11-18T07:37:05.868Z",
-    "order": 1
+    "order": 6
   },
   {
     "id": "boom-box",
@@ -36,7 +101,7 @@
     "polycount": 6036,
     "notes": "CC0. Microsoft.",
     "createdAt": "2024-03-01T00:00:00.000Z",
-    "order": 2
+    "order": 7
   },
   {
     "id": "iridescence-lamp",
@@ -49,7 +114,7 @@
     "polycount": 18866,
     "notes": "CC BY 4.0. Wayfair. The Bonsell table lamp.",
     "createdAt": "2024-03-02T00:00:00.000Z",
-    "order": 3
+    "order": 8
   },
   {
     "id": "sheen-chair",
@@ -62,7 +127,7 @@
     "polycount": 39936,
     "notes": "CC BY 4.0. Eric Chadwick for Wayfair.",
     "createdAt": "2024-03-03T00:00:00.000Z",
-    "order": 4
+    "order": 9
   },
   {
     "id": "water-bottle",
@@ -75,7 +140,7 @@
     "polycount": 4510,
     "notes": "CC0. Microsoft.",
     "createdAt": "2024-03-04T00:00:00.000Z",
-    "order": 5
+    "order": 10
   },
   {
     "id": "velvet-sofa",
@@ -88,7 +153,7 @@
     "polycount": 4196,
     "notes": "CC BY 4.0. Wayfair. Frankie sofa bed.",
     "createdAt": "2024-03-05T00:00:00.000Z",
-    "order": 6
+    "order": 11
   },
   {
     "id": "carbon-fibre",
@@ -101,7 +166,7 @@
     "polycount": 3968,
     "notes": "CC BY 4.0. Eric Chadwick for Wayfair.",
     "createdAt": "2024-03-07T00:00:00.000Z",
-    "order": 7
+    "order": 12
   },
   {
     "id": "a897b2dd2bcd",
@@ -114,6 +179,6 @@
     "thumbnail": "https://htagr3mh3puvqdzy.public.blob.vercel-storage.com/uploads/thumbs/5acb035618c7b1b1.jpg",
     "polycount": 887794,
     "createdAt": "2026-11-18T07:43:18.358Z",
-    "order": 8
+    "order": 13
   }
 ]
